@@ -1,11 +1,13 @@
 from .llm import llm,llm2
 from ..tools.code_executor import execute_python_code
 from ..tools.test_executor import execute_tests
-from backend.tools.sandbox import (
-    run_python_sandbox,
-)
 from datetime import datetime
 import re
+import os
+import sys
+import tempfile
+import subprocess
+
 
 
 def extract_text(content) -> str:
@@ -145,93 +147,89 @@ Requirements:
         )
     ]
 }
+
+
 def executor_node(state):
+    code = state.get("generated_code", "")
+    test_code = state.get("test_code", "")
 
-    generated_code = state.get(
-        "generated_code",
-        ""
-    )
-
-    test_code = state.get(
-        "test_code",
-        ""
-    )
-
-
-    if not generated_code:
-
+    if not code:
         return {
-            "execution_result":
-                "No generated code.",
-            "error":
-                "generated_code is empty",
-            "status":
-                "execution_failed",
+            "execution_result": "No code generated.",
+            "error": "generated_code is empty",
         }
 
-
-    combined_code = (
-        generated_code
-        + "\n\n"
-        + test_code
-    )
-
-
-    result = run_python_sandbox(
-        combined_code,
-        timeout=10,
-    )
-
-
-    execution_result = (
-        f"STDOUT:\n"
-        f"{result.stdout}\n\n"
-        f"STDERR:\n"
-        f"{result.stderr}\n\n"
-        f"RETURN CODE:\n"
-        f"{result.return_code}"
-    )
-
-
-    if result.timed_out:
-
+    if not test_code:
         return {
-            "execution_result":
-                execution_result,
-
-            "error":
-                "Execution timed out.",
-
-            "status":
-                "execution_timeout",
+            "execution_result": "No test code generated.",
+            "error": "test_code is empty",
         }
 
+    try:
+        with tempfile.TemporaryDirectory() as temp_dir:
 
-    if result.return_code != 0:
+            solution_path = os.path.join(
+                temp_dir,
+                "solution.py"
+            )
 
+            test_path = os.path.join(
+                temp_dir,
+                "test_solution.py"
+            )
+
+            # Write generated solution
+            with open(
+                solution_path,
+                "w",
+                encoding="utf-8"
+            ) as f:
+                f.write(code)
+
+            # Write generated tests
+            with open(
+                test_path,
+                "w",
+                encoding="utf-8"
+            ) as f:
+                f.write(test_code)
+
+            # Execute tests
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "unittest",
+                    "test_solution.py",
+                ],
+                cwd=temp_dir,
+                capture_output=True,
+                text=True,
+                timeout=15,
+            )
+
+            execution_result = (
+                f"STDOUT:\n{result.stdout}\n\n"
+                f"STDERR:\n{result.stderr}\n\n"
+                f"RETURN CODE: {result.returncode}"
+            )
+
+            return {
+                "execution_result": execution_result,
+                "error": "",
+            }
+
+    except subprocess.TimeoutExpired:
         return {
-            "execution_result":
-                execution_result,
-
-            "error":
-                result.stderr,
-
-            "status":
-                "execution_failed",
+            "execution_result": "",
+            "error": "Code execution timed out after 15 seconds.",
         }
 
-
-    return {
-    "execution_result": execution_result,
-
-    "events": [
-        create_event(
-            "executor",
-            "completed",
-            "Code execution completed."
-        )
-    ]
-}
+    except Exception as e:
+        return {
+            "execution_result": "",
+            "error": str(e),
+        }
 def debugger_node(state):
 
     task = state["task"]
@@ -706,4 +704,4 @@ def critic_router(state):
     if "DECISION: REJECTED" in critic_result:
         return "reflect"
 
-    return "approved"
+    return "approved"
