@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-
+import os
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from .agent.graph import graph
 from fastapi.middleware.cors import CORSMiddleware
@@ -24,6 +26,35 @@ app = FastAPI(
     version="1.0.0"
 )
 init_db()
+
+
+# Add your local and Vercel domains
+origins = [
+    "http://localhost:3000",
+    "https://your-frontend-app.vercel.app",  # Replace with your Vercel domain (NO trailing slash)
+    # "https://your-custom-domain.com",      # Optional: custom domain
+]
+
+# Allow dynamic origin from an environment variable if set on Render
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url:
+    origins.append(frontend_url)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/")
+def read_root():
+    return {"status": "ok", "message": "FastAPI is running"}
+
+@app.get("/api/data")
+def get_data():
+    return {"items": [1, 2, 3], "status": "success"}
 
 app.add_middleware(
     CORSMiddleware,
