@@ -52,6 +52,15 @@ def root():
     return {
         "message": "Autonomous AI Coding Agent API"
     }
+@app.get("/items/")
+@app.get("/items")
+def get_items():
+    return [
+        {"id": 1, "name": "Item 1 - Render Backend"},
+        {"id": 2, "name": "Item 2 - Render Backend"},
+        {"id": 3, "name": "Item 3 - Render Backend"}
+    ]
+
 @app.get("/api/runs")
 def list_runs():
 
