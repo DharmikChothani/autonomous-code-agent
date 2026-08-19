@@ -26,7 +26,7 @@ app = FastAPI(
 init_db()
 
 origins = [
-    "https://your-frontend-project.vercel.app",  # Production Vercel URL
+    "https://ai-agenet-mu.vercel.app/",  # Production Vercel URL
     "http://localhost:3000",                     # Local Next.js / React
     "http://localhost:5173",                     # Local Vite
 ]
