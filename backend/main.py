@@ -25,15 +25,24 @@ app = FastAPI(
 )
 init_db()
 
+origins = [
+    "https://your-frontend-project.vercel.app",  # Production Vercel URL
+    "http://localhost:3000",                     # Local Next.js / React
+    "http://localhost:5173",                     # Local Vite
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000"
-    ],
+    allow_origins=origins,
+    # allow_origin_regex=r"https://.*\.vercel\.app",  # Optional: allows all Vercel preview/branch URLs
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.get("/")
+def read_root():
+    return {"status": "Backend running on Render"}
 
 class AgentRequest(BaseModel):
     task: str
