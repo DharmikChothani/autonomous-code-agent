@@ -6,19 +6,17 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 load_dotenv()
 
-# ----------------------------------------------------
-# Primary LLM: Google Gemini
-# ----------------------------------------------------
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+print("Google key loaded:", bool(GOOGLE_API_KEY))
+print("Groq key loaded:", bool(GROQ_API_KEY))
 
 llm = ChatGoogleGenerativeAI(
     model="gemini-3.5-flash-lite",
-    google_api_key=os.getenv("GOOGLE_API_KEY"),
+    google_api_key=GOOGLE_API_KEY,
     temperature=0,
 )
-
-# ----------------------------------------------------
-# Secondary LLM: Groq
-# ----------------------------------------------------
 
 llm2 = ChatGroq(
     model="openai/gpt-oss-120b",
@@ -26,5 +24,5 @@ llm2 = ChatGroq(
     max_tokens=2048,
     top_p=1,
     reasoning_effort="medium",
-    api_key=os.getenv("GROQ_API_KEY"),
+    api_key=GROQ_API_KEY,
 )
