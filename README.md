@@ -4,6 +4,7 @@ An AI-powered autonomous software engineering agent that transforms natural-lang
 
 Built using LangGraph, LangChain, Gemini, Groq, and FastAPI, this project demonstrates how LLMs can be orchestrated into a multi-step autonomous development workflow.
 
+
 🔄 Workflow
 
 Requirement → Planning → Code Generation → Test Generation → Execution → Testing → Debugging → Code Review → Final Report
@@ -19,7 +20,9 @@ Requirement → Planning → Code Generation → Test Generation → Execution �
 👨‍💻 AI Code Reviewer — evaluates correctness, quality, and coverage
 📊 Final Engineering Report — summarizes the complete development process
 📡 Real-time streaming — displays agent progress node-by-node
-🌐 Full-stack architecture with separate frontend and backend
+🌐 Full-stack architecture with separate frontend and 
+
+
 🏗️ Architecture
 User Task
    ↓
@@ -42,12 +45,16 @@ Reviewer      Debugger
  │               │
  ↓               └──→ Coder
 Final Report
+
+
+
 🛠️ Tech Stack
 
 AI: LangGraph LangChain Gemini Groq
 Backend: Python FastAPI Pydantic
 Frontend: React Next.js
 Deployment: Render Vercel
+
 
 🎯 Project Highlights
 
@@ -65,6 +72,7 @@ Production-style API integration
 Cloud deployment
 
 
+
 🚀 Future Improvements
 Secure code-execution sandbox
 Docker-based isolation
@@ -74,5 +82,6 @@ Multi-language code generation
 Advanced LLM evaluation
 LangSmith observability
 Multi-file project generation
+
 
 Built to explore how AI can move from simply generating code to actually participating in the software development lifecycle.
